@@ -1,65 +1,169 @@
 # User Management API
 
-A RESTful API built using Spring Boot for managing users. It supports creating, retrieving, and updating user data with proper validation and error handling.
+A **Spring Boot 4** RESTful microservice for managing user records. Supports creating, retrieving, and updating users with input validation, DTO-based architecture, and centralized error handling. Packaged with Docker support.
 
-## Tech Stack
-
-* Java
-* Spring Boot
-* Spring Data JPA
-* PostgreSQL
-* Maven
+---
 
 ## Features
 
-* Create User
-* Get All Users
-* Get User by ID
-* Update User
-* Input Validation
-* Global Exception Handling
-* DTO-based architecture
+- **Create User** — Register users with validated name and email
+- **Get All Users** — Retrieve all users
+- **Get User by ID** — Fetch a single user by primary key (404 if not found)
+- **Update User** — Modify name and email of an existing user
+- **Input Validation** — `@NotBlank` on name, `@Email` on email
+- **Global Exception Handling** — Returns field-level validation errors with HTTP 400
+- **DTO Architecture** — Clean separation between request DTOs, response DTOs, and JPA entities
+- **Docker Support** — Multi-stage Dockerfile with Eclipse Temurin 17
+
+---
+
+## Tech Stack
+
+| Layer        | Technology                       |
+|--------------|----------------------------------|
+| Language     | Java 17                          |
+| Framework    | Spring Boot 4.0.5                |
+| Build Tool   | Maven                            |
+| Database     | PostgreSQL + Hibernate           |
+| Validation   | Jakarta Bean Validation          |
+| Boilerplate  | Lombok (compile-time)            |
+| Container    | Docker (Eclipse Temurin 17)      |
+| Port         | 8081                             |
+
+---
 
 ## API Endpoints
 
-### Create User
+| Method | Endpoint      | Description            |
+|--------|---------------|------------------------|
+| POST   | `/users`      | Create a new user      |
+| GET    | `/users`      | Retrieve all users     |
+| GET    | `/users/{id}` | Retrieve user by ID    |
+| PUT    | `/users/{id}` | Update an existing user|
 
-POST /users
+---
 
-### Get All Users
+## Sample Requests
 
-GET /users
+**POST /users**
 
-### Get User by ID
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com"
+}
+```
 
-GET /users/{id}
+**Response (201 Created)**
 
-### Update User
+```json
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com"
+}
+```
 
-PUT /users/{id}
+---
 
-## Configuration
+## Error Handling
 
-This project uses environment variables for database configuration:
+**400 Bad Request — Validation Error**
 
-* DB_URL
-* DB_USERNAME
-* DB_PASSWORD
+```json
+{
+  "name": "must not be blank",
+  "email": "must be a well-formed email address"
+}
+```
 
-## Running Locally
+---
 
-1. Clone the repository
-2. Set up PostgreSQL database
-3. Configure application-dev.properties
-4. Run the application
+## How to Run
 
-## Testing
+### Locally
 
-Use Postman to test the APIs.
+```bash
+# Prerequisites: Java 17+, Maven 3.8+, PostgreSQL
+
+# 1. Clone
+git clone <repo-url>
+cd usermanagement
+
+# 2. Configure database
+# Set environment variables or use application-dev.properties:
+#   DB_URL=jdbc:postgresql://localhost:5432/user_management
+#   DB_USERNAME=postgres
+#   DB_PASSWORD=your_password
+
+# 3. Build & run
+mvn spring-boot:run -Dspring.profiles.active=dev
+```
+
+### With Docker
+
+```bash
+# Build image
+docker build -t user-management-api .
+
+# Run container
+docker run -p 8081:8081 \
+  -e DB_URL=jdbc:postgresql://host.docker.internal:5432/user_management \
+  -e DB_USERNAME=postgres \
+  -e DB_PASSWORD=your_password \
+  user-management-api
+```
+
+---
+
+## Environment Variables
+
+| Variable      | Description                |
+|---------------|----------------------------|
+| `DB_URL`      | PostgreSQL JDBC URL        |
+| `DB_USERNAME` | Database username          |
+| `DB_PASSWORD` | Database password          |
+
+---
+
+## Project Structure
+
+```
+src/main/java/com/manu/usermanagement/
+  UsermanagementApplication.java
+  controller/   UserController.java
+  service/      UserService.java
+  repository/   UserRepository.java
+  model/        User.java
+  dto/          UserRequest.java, UserResponse.java
+  exception/    GlobalExceptionHandler.java
+
+src/main/resources/
+  application.properties
+  application-dev.properties
+
+Dockerfile
+pom.xml
+```
+
+---
 
 ## Future Improvements
 
-* Add Delete API
-* Pagination
-* Swagger Documentation
-* Deployment
+- Add Delete API
+- Pagination and sorting
+- Swagger / OpenAPI documentation
+- Unit and integration tests
+- CI/CD pipeline
+
+---
+
+## Author
+
+**Manu Kumar H N**
+
+---
+
+## License
+
+MIT
